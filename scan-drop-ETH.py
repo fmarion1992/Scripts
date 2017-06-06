@@ -36,24 +36,22 @@ NUMBER_VALUE=15
 if len(sys.argv) == 3:
     FAIL_PERCENTAGE_THRESHOLD=float(sys.argv[1])
     NUMBER_VALUE=int(sys.argv[2])
-    
-print('Using parameters : ')
-print('     FAIL_PERCENTAGE_THRESHOLD -> ', FAIL_PERCENTAGE_THRESHOLD)
-print('     NUMBER_VALUE -> ', NUMBER_VALUE)
+
+print('Scanning [ Threshold percentage -> ', FAIL_PERCENTAGE_THRESHOLD, ', Queue size -> ', NUMBER_VALUE, ' ] ...')
 
 while True :    
     url = 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=EUR'
     response = requests.get(url)
-    
+    maxFall = 0
     queue = list()
     
     for bid in response.json()["Data"]:
         appendToQueue(queue, bid['high'])
         
         fall = getFallPercentage(queue[0], queue[len(queue)-1])
+        maxFall = max(fall, maxFall)
         if fall > FAIL_PERCENTAGE_THRESHOLD:
-            print('Threshold reached : ')
-            print('     Fall off percentage -> ', fall)
-            print('     Date -> ', dateFormat(bid['time']))
+            print('Threshold reached [ Fall off percentage -> ', fall, ', Date of bid-> ', dateFormat(bid['time']))
     time.sleep(30)
+    print('Ending iteration [ Max fall percentage -> ', maxFall, ' ]')
     
