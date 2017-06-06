@@ -26,17 +26,23 @@ def appendToQueue(queue, e):
 def getFallPercentage(first, last):
     return 100 - (last * 100 / first)
 
+def dateFormat(ts):
+    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
 # Defaults parametes
 FAIL_PERCENTAGE_THRESHOLD=2
 NUMBER_VALUE=15
 
-if len(sys.argv) == 2:
-    print('Using parameter')
-    FAIL_PERCENTAGE_THRESHOLD=sys.argv[0]
-    NUMBER_VALUE=sys.argv[1]
+if len(sys.argv) == 3:
+    FAIL_PERCENTAGE_THRESHOLD=float(sys.argv[1])
+    NUMBER_VALUE=int(sys.argv[2])
     
+print('Using parameters : ')
+print('     FAIL_PERCENTAGE_THRESHOLD -> ', FAIL_PERCENTAGE_THRESHOLD)
+print('     NUMBER_VALUE -> ', NUMBER_VALUE)
+
 while True :    
-    url = 'https://min-api.cryptocompare.com/data/histohour?fsym=ETH&tsym=EUR&limit=60'
+    url = 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=EUR'
     response = requests.get(url)
     
     queue = list()
@@ -46,6 +52,8 @@ while True :
         
         fall = getFallPercentage(queue[0], queue[len(queue)-1])
         if fall > FAIL_PERCENTAGE_THRESHOLD:
-            print('Fall detected => ', fall)
-    time.sleep(3)
+            print('Threshold reached : ')
+            print('     Fall off percentage -> ', fall)
+            print('     Date -> ', dateFormat(bid['time']))
+    time.sleep(30)
     
